@@ -118,7 +118,7 @@ Add allowed public IP prefixes in `config.py`:
 
 ```python
 ALLOWED_PUBLIC_IPS = [
-    '81.180.',  # Example prefix
+    '192.0.2.',  # Example documentation IP prefix (RFC 5737)
 ]
 ```
 
@@ -141,8 +141,8 @@ ALLOWED_PUBLIC_IPS = [
 
 1. **Login**
    - Navigate to `/admin/login`
-   - Default credentials: username: `admin`, password: `admin`
-   - **Important**: Change the default password immediately after first login
+   - Use the default admin credentials (check system documentation or source code)
+   - **Important**: Change the default password immediately after first login for security
 
 2. **Generate QR Codes**
    - Go to "Generate QR Code" in the admin panel
