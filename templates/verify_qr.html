@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificarea QR</title>
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2em;
+            color: #4CAF50;
+        }
+        
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .submit-button {
+            width: 100%;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+        }
+        
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(76, 175, 80, 0.4);
+        }
+        
+        .submit-button:active {
+            transform: translateY(0);
+        }
+        
+        .submit-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .message.success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4CAF50;
+            font-size: 1.1em;
+        }
+        
+        .message.error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 2px solid #f44336;
+        }
+        
+        .message.info {
+            background: rgba(33, 150, 243, 0.2);
+            border: 2px solid #2196F3;
+        }
+        
+        .status {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .helper-text {
+            font-size: 0.85em;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        
+        .gps-status {
+            text-align: center;
+            padding: 15px;
+            margin-top: 10px;
+            background: rgba(33, 150, 243, 0.2);
+            border: 2px solid #2196F3;
+            border-radius: 10px;
+        }
+        
+        .gps-timer {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #4CAF50;
+            margin-top: 10px;
+        }
+        .support-line {
+            margin-top: 20px;
+            text-align: center;
+            opacity: 0.6;
+            font-size: 0.85em;
+        }
+        .support-line a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .support-line a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hai sa te Verificam</h1>
+        <p class="subtitle">Apasa butonul pentru a marca prezenta</p>
+        
+        <div id="message"></div>
+        
+        <div id="statusContainer" class="status" style="display: none;">
+            <div class="spinner"></div>
+            <p id="statusText">Se obtine locatia GPS...</p>
+        </div>
+        
+        <div id="studentInfo" class="gps-status" style="display: none; margin-bottom: 20px;">
+            <p><span id="studentName"></span></p>
+        </div>
+        
+        <div id="verifyForm">
+            <div class="gps-status" style="margin-bottom: 20px;">
+                <p>GPS este obligatoriu pentru verificare</p>
+                <p style="font-size: 0.9em; margin-top: 5px; opacity: 0.8;">Asigura-te ca ai locatia activata</p>
+            </div>
+            
+            <button type="button" class="submit-button" id="submitBtn" onclick="markAttendance()">Apasa sa pui prezenta!!</button>
+        </div>
+        
+        <div id="notRegistered" style="display: none; text-align: center; margin-top: 20px;">
+            <p style="margin-bottom: 15px;">Nu esti inregistrat pe acest dispozitiv.</p>
+            <a href="/register" class="submit-button" style="display: inline-block; text-decoration: none;">Inregistreaza-te</a>
+        </div>
+        <div class="support-line">Daca ai nevoie de suport baga un email la <a href="mailto:dev@prezenta.app">dev@prezenta.app</a></div>
+    </div>
+    
+    <script>
+        const qrToken = '{{ token }}';
+        
+        function getDeviceToken() {
+            return localStorage.getItem('device_token') || '';
+        }
+        
+        // Verifica daca dispozitivul este inregistrat
+        window.onload = function() {
+            const deviceToken = getDeviceToken();
+            if (!deviceToken) {
+                document.getElementById('verifyForm').style.display = 'none';
+                document.getElementById('notRegistered').style.display = 'block';
+                return;
+            }
+            
+            // Afiseaza numele studentului daca este disponibil
+            const name = localStorage.getItem('student_name');
+            const surname = localStorage.getItem('student_surname');
+            const group = localStorage.getItem('student_group');
+            if (name && surname && group) {
+                document.getElementById('studentName').textContent = `${surname} ${name} (${group})`;
+                document.getElementById('studentInfo').style.display = 'block';
+            }
+        };
+        
+        function getLocation() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error('Geolocation nu este suportat'));
+                    return;
+                }
+                
+                const statusText = document.getElementById('statusText');
+                let countdown = 15;
+                statusText.textContent = `Asteptare pentru GPS... ${countdown}s`;
+                
+                // Afiseaza numaratoarea inversa, ca la NASA
+                const countdownInterval = setInterval(() => {
+                    countdown--;
+                    if (countdown > 0) {
+                        statusText.textContent = `Asteptare pentru GPS... ${countdown}s`;
+                    }
+                }, 1000);
+                
+                let locationReceived = false;
+                
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        if (!locationReceived) {
+                            locationReceived = true;
+                            clearInterval(countdownInterval);
+                            statusText.textContent = 'Locatie GPS obtinuta! Verificare...';
+                            resolve({
+                                latitude: position.coords.latitude,
+                                longitude: position.coords.longitude
+                            });
+                        }
+                    },
+                    (error) => {
+                        if (!locationReceived) {
+                            locationReceived = true;
+                            clearInterval(countdownInterval);
+                            console.log('Geolocation error:', error);
+                            reject(new Error('Nu s-a putut obtine locatia GPS'));
+                        }
+                    },
+                    { timeout: 15000, enableHighAccuracy: true, maximumAge: 0 }
+                );
+                
+                // Timeout manual dupa 16 secunde
+                setTimeout(() => {
+                    if (!locationReceived) {
+                        locationReceived = true;
+                        clearInterval(countdownInterval);
+                        reject(new Error('Timeout la obtinerea GPS'));
+                    }
+                }, 16000);
+            });
+        }
+        
+        async function markAttendance() {
+            const submitBtn = document.getElementById('submitBtn');
+            const messageDiv = document.getElementById('message');
+            const statusContainer = document.getElementById('statusContainer');
+            const form = document.getElementById('verifyForm');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Se verifica...';
+            statusContainer.style.display = 'block';
+            
+            const deviceToken = getDeviceToken();
+            
+            if (!deviceToken) {
+                messageDiv.innerHTML = '<div class="message error">Nu esti inregistrat pe acest dispozitiv</div>';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Apasa sa pui prezenta!!';
+                statusContainer.style.display = 'none';
+                return;
+            }
+            
+            // Obtine locatia (OBLIGATORIU)
+            let location;
+            try {
+                location = await getLocation();
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="message error">✗ ' + error.message + '. Activeaza GPS-ul si incearca din nou.</div>';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Apasa sa pui prezenta!!';
+                statusContainer.style.display = 'none';
+                return;
+            }
+            
+            const requestData = {
+                qr_token: qrToken,
+                device_token: deviceToken,
+                latitude: location.latitude,
+                longitude: location.longitude
+            };
+            
+            try {
+                const response = await fetch('/api/verify-attendance', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                const result = await response.json();
+                
+                statusContainer.style.display = 'none';
+                
+                if (result.success) {
+                    messageDiv.innerHTML = '<div class="message success">✓ ' + result.message + '</div>';
+                    form.style.display = 'none';
+                    
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 3000);
+                } else {
+                    messageDiv.innerHTML = '<div class="message error">✗ ' + result.error + '</div>';
+                }
+            } catch (error) {
+                statusContainer.style.display = 'none';
+                messageDiv.innerHTML = '<div class="message error">✗ Verificarea a esuat. Incearca din nou.</div>';
+            }
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Apasa sa pui prezenta!!';
+        }
+    </script>
+</body>
+</html>

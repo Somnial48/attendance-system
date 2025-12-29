@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setarile LA APP</title>
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            max-width: 1000px;
+            margin: 0 auto 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        h1 {
+            color: #4CAF50;
+            font-size: 2em;
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 1em;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+        
+        .section h2 {
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+        
+        .info-box {
+            background: rgba(33, 150, 243, 0.2);
+            border: 2px solid #2196F3;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box h3 {
+            margin-bottom: 10px;
+            color: #2196F3;
+        }
+        
+        .settings-list {
+            list-style: none;
+        }
+        
+        .settings-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .settings-item .label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .settings-item .value {
+            opacity: 0.8;
+            font-family: monospace;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        
+        th {
+            background: rgba(76, 175, 80, 0.2);
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #4CAF50;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .code-block {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin-top: 10px;
+            overflow-x: auto;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: transform 0.2s;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .message.success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4CAF50;
+            color: #4CAF50;
+        }
+        
+        .message.error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 2px solid #f44336;
+            color: #f44336;
+        }
+        
+        .warning-badge {
+            display: inline-block;
+            background: rgba(255, 152, 0, 0.2);
+            border: 2px solid #FF9800;
+            color: #FF9800;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .support-line {
+            margin-top: 20px;
+            text-align: center;
+            opacity: 0.6;
+            font-size: 0.85em;
+        }
+        .support-line a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .support-line a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Setari agresive</h1>
+        <a href="/admin/dashboard" class="back-btn">← Inapoi la Dashboard</a>
+    </div>
+    
+    <div class="container">
+        <div class="info-box">
+            <h3>Configurare</h3>
+            <p>Setarile sunt configurate in <code>config.py</code>. Pentru a modifica adresele IP sau locatiile salilor de clasa, editeaza fisierul de configurare si reporneste serverul.</p>
+        </div>
+        
+        <div class="section">
+            <h2> Securitate Cont
+                {% if not password_changed %}
+                <span class="warning-badge">Folosind Parola Implicita</span>
+                {% endif %}
+            </h2>
+            <p style="margin-bottom: 15px; opacity: 0.8;">Logged in as: <strong>{{ username }}</strong></p>
+            
+            <div id="passwordMessage"></div>
+            
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label for="current_password">Parola Curenta</label>
+                    <input type="password" id="current_password" name="current_password" required placeholder="Introduceti parola curenta">
+                </div>
+                
+                <div class="form-group">
+                    <label for="new_password">Parola Noua</label>
+                    <input type="password" id="new_password" name="new_password" required placeholder="Introduceti parola noua (min 6 caractere)">
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirm_password">Confirma Parola Noua</label>
+                    <input type="password" id="confirm_password" name="confirm_password" required placeholder="Confirmati parola noua">
+                </div>
+                
+                <button type="submit" class="submit-btn" id="passwordBtn">Schimba Parola</button>
+            </form>
+        </div>
+        
+        <div class="section">
+            <h2>IP Permise, posibil..</h2>
+            <p style="margin-bottom: 15px; opacity: 0.8;">Studentii pot marca prezenta din aceste prefixe IP (retea universitara)</p>
+            
+            <ul class="settings-list">
+                {% for ip in allowed_ips %}
+                <li class="settings-item">
+                    <div class="label">IP Prefix {{ loop.index }}</div>
+                    <div class="value">{{ ip }}</div>
+                </li>
+                {% endfor %}
+            </ul>
+            
+            <div class="code-block">
+# In config.py, modifica:
+ALLOWED_PUBLIC_IPS = [
+    '81.180.73.',  # Ip universtiat
+    '172.18.9.',     # Posibil ip local
+]
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Locatia salii</h2>
+            <p style="margin-bottom: 15px; opacity: 0.8;">Coordonate GPS/raza</div>p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Clasa</th>
+                        <th>Latitudine</th>
+                        <th>Longitudine</th>
+                        <th>Raza (m)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for name, data in classrooms.items() %}
+                    <tr>
+                        <td><strong>{{ name }}</strong></td>
+                        <td>{{ data.lat }}</td>
+                        <td>{{ data.lng }}</td>
+                        <td>{{ data.radius_meters }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <div class="code-block">
+# In config.py, modify:
+CLASSROOMS = {
+    '6-2': {
+        'lat': 47.0105,
+        'lon': 28.8638,
+        'radius': 50  # meters
+    },
+
+}
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Setari securitate</h2>
+            
+            <ul class="settings-list">
+                <li class="settings-item">
+                    <div class="label">Valabilitate Cod QR</div>
+                    <div class="value">40 secunde</div>
+                </li>
+                <li class="settings-item">
+                    <div class="label">Algoritm Hash</div>
+                    <div class="value">SHA-256</div>
+                </li>
+                <li class="settings-item">
+                    <div class="label">Hash Parola</div>
+                    <div class="value">SHA-256</div>
+                </li>
+            </ul>
+        </div>
+        <div class="support-line">Daca ai nevoie de suport baga un email la <a href="mailto:dev@prezenta.app">dev@prezenta.app</a></div>
+    </div>
+    
+    <script>
+        document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const passwordBtn = document.getElementById('passwordBtn');
+            const messageDiv = document.getElementById('passwordMessage');
+            
+            passwordBtn.disabled = true;
+            passwordBtn.textContent = 'Changing Password...';
+            
+            const formData = {
+                action: 'change_password',
+                current_password: document.getElementById('current_password').value,
+                new_password: document.getElementById('new_password').value,
+                confirm_password: document.getElementById('confirm_password').value
+            };
+            
+            try {
+                const response = await fetch('/admin/settings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    messageDiv.innerHTML = '<div class="message success">✓ ' + result.message + '</div>';
+                    document.getElementById('passwordForm').reset();
+                    
+                    //Se da refresh la pagina pentru a actualiza starea parolei
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    messageDiv.innerHTML = '<div class="message error">✗ ' + result.error + '</div>';
+                }
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="message error">✗ Nu sa putut schimba parola.</div>';
+            }
+            
+            passwordBtn.disabled = false;
+            passwordBtn.textContent = 'Schimba Parola';
+        });
+    </script>
+</body>
+</html>

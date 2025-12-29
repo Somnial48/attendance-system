@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Profesor</title>
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 400px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2em;
+            color: #4CAF50;
+        }
+        
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .submit-button {
+            width: 100%;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+        }
+        
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(76, 175, 80, 0.4);
+        }
+        
+        .submit-button:active {
+            transform: translateY(0);
+        }
+        
+        .submit-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #4CAF50;
+            text-decoration: none;
+            opacity: 0.8;
+        }
+        
+        .back-link:hover {
+            opacity: 1;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .message.error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 2px solid #f44336;
+        }
+        
+        .default-creds {
+            background: rgba(255, 193, 7, 0.2);
+            border: 2px solid #FFC107;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+        
+        .default-creds h3 {
+            margin-bottom: 10px;
+            color: #FFC107;
+        }
+        .support-line {
+            margin-top: 20px;
+            text-align: center;
+            opacity: 0.6;
+            font-size: 0.85em;
+        }
+        .support-line a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .support-line a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Conectare profesorului</h1>
+        <p class="subtitle">Admin Dashboard Access shhhhh....</p>
+        
+        <div class="default-creds" id="defaultCredsBox" style="display: none;">
+            <h3> Default Credentials</h3>
+            <p><strong>Username:</strong> admin</p>
+            <p><strong>Password:</strong> admin123</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Va rog schimabtile</p>
+        </div>
+        
+        <div id="message"></div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required placeholder="Introduceti username-ul">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Parola</label>
+                <input type="password" id="password" name="password" required placeholder="Introduceti parola">
+            </div>
+            
+            <button type="submit" class="submit-button" id="submitBtn">Login</button>
+        </form>
+        
+        <a href="/" class="back-link">← Inapoi la Home</a>
+        <div class="support-line">Daca ai nevoie de suport baga un email la <a href="mailto:dev@prezenta.app">dev@prezenta.app</a></div>
+    </div>
+    
+    <script>
+        // Se verifica daca parola default este inca folosita
+        async function checkDefaultPassword() {
+            try {
+                const response = await fetch('/api/admin/check-default-password');
+                const result = await response.json();
+                
+                if (result.using_default) {
+                    document.getElementById('defaultCredsBox').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Ciudat, eroare la verificare parolei default', error);
+            }
+        }
+        
+        checkDefaultPassword();
+        
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const messageDiv = document.getElementById('message');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Logging in...';
+            
+            const formData = {
+                username: document.getElementById('username').value.trim(),
+                password: document.getElementById('password').value
+            };
+            
+            try {
+                const response = await fetch('/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    window.location.href = '/admin/dashboard';
+                } else {
+                    messageDiv.innerHTML = '<div class="message error">✗ ' + result.error + '</div>';
+                }
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="message error">✗ Login failed. Mai incearca odata</div>';
+            }
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Login';
+        });
+    </script>
+</body>
+</html>

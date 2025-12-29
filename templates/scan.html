@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanare Cod QR</title>
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #fff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .container {
+            width: 100%; max-width: 520px; background: rgba(255,255,255,0.1); border-radius: 20px; padding: 24px; backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        h1 { text-align: center; margin-bottom: 8px; font-size: 1.8em; color: #4CAF50; }
+        .subtitle { text-align: center; margin-bottom: 16px; opacity: 0.85; font-size: 0.95em; }
+        .video-wrap { position: relative; border-radius: 14px; overflow: hidden; background: #000; }
+        video { width: 100%; height: auto; display: block; }
+        canvas { display: none; }
+        .scan-overlay {
+            position: absolute; inset: 0; pointer-events: none; box-shadow: 0 0 0 200vmax rgba(0,0,0,0.25) inset;
+        }
+        .controls { display: flex; gap: 10px; margin-top: 14px; }
+        .button {
+            flex: 1; background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); color: #fff; border: 0; padding: 14px; border-radius: 12px;
+            font-weight: 600; cursor: pointer; transition: transform .2s, box-shadow .2s; text-align: center;
+        }
+        .button.secondary { background: rgba(255,255,255,0.12); }
+        .button:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(76,175,80,0.35); }
+        .button:disabled { opacity: .6; cursor: not-allowed; }
+        .message { margin-top: 14px; padding: 12px; border-radius: 10px; text-align: center; }
+        .message.error { background: rgba(244,67,54,0.18); border: 2px solid #f44336; }
+        .message.success { background: rgba(76,175,80,0.18); border: 2px solid #4CAF50; }
+        .helper { margin-top: 8px; text-align: center; opacity: .75; font-size: .9em; }
+        .manual {
+            margin-top: 16px; display: grid; gap: 10px; grid-template-columns: 1fr auto; align-items: center;
+        }
+        input[type="text"] {
+            width: 100%; padding: 12px; border-radius: 10px; border: 2px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1); color: #fff; font-size: 1em;
+        }
+        .support-line { margin-top: 16px; text-align: center; opacity: .6; font-size: .85em; }
+        .support-line a { color: #4CAF50; text-decoration: none; }
+        .support-line a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Scanare Cod QR</h1>
+    <p class="subtitle">Indreapta camera spre codul QR de la profesor</p>
+
+    <div id="msg" class="message" style="display:none"></div>
+
+    <div class="video-wrap">
+        <video id="video" autoplay playsinline></video>
+        <div class="scan-overlay"></div>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <div class="controls">
+        <button id="startBtn" class="button">Porneste camera</button>
+        <button id="stopBtn" class="button secondary" disabled>Opreste</button>
+    </div>
+
+    <p class="helper">Daca nu merge automat, poti introduce token-ul manual.</p>
+
+    <div class="manual">
+        <input id="manualToken" type="text" placeholder="Token QR (ex: abc123...)" />
+        <button id="goBtn" class="button" style="padding: 12px 16px;">→</button>
+    </div>
+
+    <div class="support-line">Daca ai nevoie de suport baga un email la <a href="mailto:dev@prezenta.app">dev@prezenta.app</a></div>
+</div>
+
+<script>
+const QR_TOKEN_BUFFER_SECONDS = {{ qr_token_buffer_seconds|default(7)|tojson }};
+const TOKEN_VALIDITY_SECONDS = {{ token_validity_seconds|default(10)|tojson }};
+(function(){
+    const QR_TOKEN_BUFFER_SECONDS = {{ qr_token_buffer_seconds|default(7)|tojson }};
+    const TOKEN_VALIDITY_SECONDS = {{ token_validity_seconds|default(10)|tojson }};
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const startBtn = document.getElementById('startBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const msg = document.getElementById('msg');
+    const manualToken = document.getElementById('manualToken');
+    const goBtn = document.getElementById('goBtn');
+
+    let stream = null;
+    let rafId = null;
+    let scanning = false;
+    let usingBarcodeDetector = false;
+
+    function showMessage(text, type='error'){
+        msg.textContent = text;
+        msg.className = 'message ' + type;
+        msg.style.display = 'block';
+    }
+
+    function clearMessage(){ msg.style.display = 'none'; }
+
+    function resolveTarget(value){
+        try {
+            const v = (value||'').trim();
+            if(!v) return null;
+            if (/^https?:\/\//i.test(v)) return v; // Intreg url
+            // Daca e doar token, construieste url-ul
+            return '/verify/qr/' + encodeURIComponent(v);
+        } catch(e){ return null; }
+    }
+
+    function redirectTo(target){
+        if(target) window.location.href = target;
+    }
+
+    async function startCamera(){
+        clearMessage();
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: { ideal: 'environment' } }, audio: false
+            });
+            video.srcObject = stream;
+            await video.play();
+            stopBtn.disabled = false;
+            startBtn.disabled = true;
+            scanning = true;
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            runScanner();
+        } catch (e){
+            console.error(e);
+            showMessage('Nu s-a putut porni camera. Verifica permisiunile.', 'error');
+        }
+    }
+
+    function stopCamera(){
+        scanning = false;
+        if (rafId) cancelAnimationFrame(rafId);
+        if (stream){
+            stream.getTracks().forEach(t=>t.stop());
+            stream = null;
+        }
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+    }
+
+    async function tryBarcodeDetector(){
+        if (!('BarcodeDetector' in window)) return false;
+        try {
+            const formats = await window.BarcodeDetector.getSupportedFormats();
+            if (!formats.includes('qr_code')) return false;
+            const detector = new BarcodeDetector({ formats: ['qr_code'] });
+            usingBarcodeDetector = true;
+
+            const detectFrame = async () => {
+                if (!scanning) return;
+                try {
+                    const barcodes = await detector.detect(video);
+                    if (barcodes && barcodes.length > 0){
+                        const value = barcodes[0].rawValue || '';
+                        const target = resolveTarget(value);
+                        if (target){
+                            stopCamera();
+                            redirectTo(target);
+                            return;
+                        }
+                    }
+                } catch(e) { } // se ig
+                rafId = requestAnimationFrame(detectFrame);
+            };
+            detectFrame();
+            return true;
+        } catch(e){
+            return false;
+        }
+    }
+
+    async function runScanner(){
+        // Prima incercare: foloseste BarcodeDetector API
+        const ok = await tryBarcodeDetector();
+        if (ok) return;
+
+        // A doua incercare: foloseste jsQR
+        usingBarcodeDetector = false;
+        if (!window.jsQR){
+            await new Promise((resolve, reject) => {
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js';
+                s.onload = resolve; s.onerror = () => reject(new Error('Nu s-a putut incarca jsQR'));
+                document.head.appendChild(s);
+            }).catch(() => showMessage('Nu s-a putut incarca decodorul QR (jsQR).', 'error'));
+            if (!window.jsQR) return;
+        }
+
+        const scan = () => {
+            if (!scanning) return;
+            try {
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const code = window.jsQR(imageData.data, imageData.width, imageData.height);
+                if (code && code.data){
+                    const target = resolveTarget(code.data);
+                    if (target){
+                        stopCamera();
+                        redirectTo(target);
+                        return;
+                    }
+                }
+            } catch(e) {  }
+            rafId = requestAnimationFrame(scan);
+        };
+        scan();
+    }
+
+    // Butoane
+    startBtn.addEventListener('click', startCamera);
+    stopBtn.addEventListener('click', stopCamera);
+    goBtn.addEventListener('click', () => {
+        const target = resolveTarget(manualToken.value);
+        if (!target) { showMessage('Token invalid.', 'error'); return; }
+        redirectTo(target);
+    });
+
+    // Auto start daca permisiunea e deja pusa
+    if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'function'){
+        navigator.permissions && navigator.permissions.query({name: 'camera'}).then(p => {
+            if (p.state === 'granted') startCamera();
+        }).catch(() => {});
+    } else {
+        showMessage('Camera nu este suportata pe acest dispozitiv.', 'error');
+    }
+})();
+</script>
+</body>
+</html>

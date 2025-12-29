@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate QR Code </title>
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+   
+    
+        .warning-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #dc2626;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .warning-screen.active {
+            display: flex;
+        }
+        
+        .warning-screen .icons {
+            font-size: 8em;
+            margin-bottom: 30px;
+        }
+        
+        .warning-screen h1 {
+            color: white;
+            font-size: 8em;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+        
+        .warning-screen h2 {
+            color: white;
+            font-size: 4em;
+            max-width: 900px;
+            line-height: 1.5;
+            font-weight: 600;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            max-width: 800px;
+            margin: 0 auto 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        h1 {
+            color: #4CAF50;
+            font-size: 2em;
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 1em;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .form-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        select option {
+            background: #2d2d2d;
+            color: #fff;
+        }
+        
+        .submit-button {
+            width: 100%;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-weight: 600;
+        }
+        
+        .submit-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .submit-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .qr-display {
+            display: none;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .qr-display.active {
+            display: block;
+        }
+        
+        .qr-code {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            display: inline-block;
+            margin: 20px 0;
+        }
+        
+        .qr-code img {
+            display: block;
+            max-width: 100%;
+        }
+        
+        .timer {
+            font-size: 3em;
+            font-weight: bold;
+            color: #4CAF50;
+            margin: 20px 0;
+        }
+        
+        .timer.warning {
+            color: #FFC107;
+        }
+        
+        .timer.danger {
+            color: #f44336;
+        }
+        
+        .qr-info {
+            background: rgba(33, 150, 243, 0.2);
+            border: 2px solid #2196F3;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .qr-info p {
+            margin: 5px 0;
+        }
+        
+        .generate-new-btn {
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 15px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        
+        .generate-new-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .support-line {
+            margin-top: 20px;
+            text-align: center;
+            opacity: 0.6;
+            font-size: 0.85em;
+        }
+        .support-line a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .support-line a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="warning-screen" id="warningScreen">
+        <h1>IMPORTANT </h1>
+        <h2>Trebuie sa fiti conectat la reteaua UTM si GPS pornit!</h2>
+    </div>
+
+    <div class="header">
+        <h1> Genereaza QR Code</h1>
+        <a href="/admin/dashboard" class="back-btn">← Inapoi la Dashboard</a>
+    </div>
+    
+    <div class="container">
+        <div class="form-section" id="formSection">
+            <form id="generateForm">
+                <div class="form-group">
+                    <label for="lesson_id">ID Lectie</label>
+                    <input type="text" id="lesson_id" name="lesson_id" required placeholder="e.g., TP-id3??">
+                </div>
+                
+                <div class="form-group">
+                    <label for="classroom">Clasa</label>
+                    <select id="classroom" name="classroom" required>
+                        <option value="">Alege clasa...   poate vom pune mai multe</option>
+                        {% for classroom in classrooms %}
+                        <option value="{{ classroom }}">{{ classroom }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <button type="submit" class="submit-button" id="submitBtn">Genereaza QR Code</button>
+            </form>
+        </div>
+        
+        <div class="qr-display" id="qrDisplay">
+            <h2>QR Code Generat</h2>
+            <p>Students pot scana acest QR, sa vedem daca sunt prezenti</p>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <p style="opacity: 0.8; margin-bottom: 10px;">Timp ramas</p>
+                <div class="timer" id="sessionTimer">40</div>
+            </div>
+            
+            <div class="qr-code" id="qrCode"></div>
+            
+            <div class="qr-info">
+                <p><strong>Lesson:</strong> <span id="displayLessonId"></span></p>
+                <p><strong>Classroom:</strong> <span id="displayClassroom"></span></p>
+                <p><strong>Cod:</strong> <span id="displayCode"></span> <button id="copyCodeBtn" class="generate-new-btn" style="padding:8px 12px; margin-left:8px;">Copiaza</button></p>
+            </div>
+            
+            <button class="generate-new-btn" onclick="resetForm()">Genereaza nou QR Code</button>
+        </div>
+        <div class="support-line">Daca ai nevoie de suport baga un email la <a href="mailto:dev@prezenta.app">dev@prezenta.app</a></div>
+    </div>
+    
+    <script>
+        let countdownInterval = null;
+        let rotationInterval = null;
+        let warningTimeout = null;
+        let sessionData = null;
+        let pendingFormData = null;
+        const QR_ROTATION_SECONDS = 10;
+        const TOTAL_SESSION_SECONDS = 40;
+        const TOTAL_QR_CYCLES = 4;
+        const WARNING_SECONDS = 6;
+        
+        function showWarningAndGenerate(formData) {
+            pendingFormData = formData;
+            const warningScreen = document.getElementById('warningScreen');
+            
+            warningScreen.classList.add('active');
+            
+            // HDuoa 6 secunde, ascunde warning si genereaza QR
+            warningTimeout = setTimeout(() => {
+                warningScreen.classList.remove('active');
+                generateQRCode(pendingFormData);
+            }, WARNING_SECONDS * 1000);
+        }
+        
+        document.getElementById('generateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Generating...';
+            
+            const formData = {
+                lesson_id: document.getElementById('lesson_id').value.trim(),
+                classroom: document.getElementById('classroom').value
+            };
+            
+            // Se arata worning mai intai
+            showWarningAndGenerate(formData);
+        });
+        
+        async function generateQRCode(formData) {
+            const submitBtn = document.getElementById('submitBtn');
+            
+            try {
+                const response = await fetch('/admin/generate-qr', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Se stocheaza datele sesiunii
+                    sessionData = {
+                        lesson_id: result.lesson_id,
+                        classroom: result.classroom,
+                        session_id: result.session_id,
+                        session_start_time: result.session_start_time,
+                        session_expires_at: result.session_expires_at
+                    };
+                    
+                    // QR cod aici se arata
+                    document.getElementById('formSection').style.display = 'none';
+                    document.getElementById('qrDisplay').classList.add('active');
+                    updateQRDisplay(result.qr_image, result.display_code);
+                    document.getElementById('displayLessonId').textContent = result.lesson_id;
+                    document.getElementById('displayClassroom').textContent = result.classroom;
+                    
+                    // Se incepe rotatia si countdown
+                    startSessionManagement();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('Nu sa putut genere  a QR Code. Mai incearca odata.');
+            }
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Genereaza QR Code';
+        }
+        
+        function updateQRDisplay(qrImage, displayCode) {
+            document.getElementById('qrCode').innerHTML = '<img src="' + qrImage + '" alt="QR Code">';
+            if (typeof displayCode === 'string') {
+                const cEl = document.getElementById('displayCode');
+                cEl.textContent = displayCode;
+                cEl.dataset.code = displayCode;
+            }
+        }
+        
+        async function rotateQRCode() {
+            if (!sessionData) return;
+            
+            // Se verifica daca sesiunea a expirat
+            const now = Date.now() / 1000;
+            if (now >= sessionData.session_expires_at) {
+                return;
+            }
+            
+            try {
+                const response = await fetch('/admin/generate-qr', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        lesson_id: sessionData.lesson_id,
+                        classroom: sessionData.classroom,
+                        session_id: sessionData.session_id,
+                        session_start_time: sessionData.session_start_time
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    updateQRDisplay(result.qr_image, result.display_code);
+                }
+            } catch (error) {
+                console.error('Nu s-a putut roti codul QR:', error);
+            }
+        }
+        
+        function startSessionManagement() {
+            const sessionTimerElement = document.getElementById('sessionTimer');
+            
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            if (rotationInterval) {
+                clearInterval(rotationInterval);
+            }
+            
+            // Se roteste QR codul la fiecare 10 secunde
+            let nextRotation = Date.now() / 1000 + QR_ROTATION_SECONDS;
+            
+            countdownInterval = setInterval(() => {
+                const now = Date.now() / 1000;
+                const sessionRemaining = Math.max(0, Math.ceil(sessionData.session_expires_at - now));
+                const qrRemaining = Math.max(0, Math.ceil(nextRotation - now));
+                
+                // Se actualizeaza timer-ul sesiunii
+                sessionTimerElement.textContent = sessionRemaining;
+                
+                if (sessionRemaining <= 10) {
+                    sessionTimerElement.classList.add('danger');
+                    sessionTimerElement.classList.remove('warning');
+                } else if (sessionRemaining <= 20) {
+                    sessionTimerElement.classList.add('warning');
+                    sessionTimerElement.classList.remove('danger');
+                } else {
+                    sessionTimerElement.classList.remove('warning', 'danger');
+                }
+                
+                // Se roteste codul QR silentios cand timer-ul ajunge la 0
+                if (qrRemaining === 0 && sessionRemaining > 0) {
+                    rotateQRCode();
+                    nextRotation = now + QR_ROTATION_SECONDS;
+                }
+                
+                // Sesiunea a expirat
+                if (sessionRemaining === 0) {
+                    clearInterval(countdownInterval);
+                    alert('QR code session a expirat. Va rog generati unul nou.');
+                }
+            }, 1000);
+        }
+        
+        function resetForm() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            if (rotationInterval) {
+                clearInterval(rotationInterval);
+            }
+            sessionData = null;
+            document.getElementById('formSection').style.display = 'block';
+            document.getElementById('qrDisplay').classList.remove('active');
+            document.getElementById('generateForm').reset();
+        }
+
+        // Buton sa copii codul
+        document.getElementById('copyCodeBtn').addEventListener('click', async () => {
+            const cEl = document.getElementById('displayCode');
+            const code = cEl.dataset.code || cEl.textContent;
+            if (!code) return;
+            try {
+                await navigator.clipboard.writeText(code);
+                alert('Cod copiat in clipboard');
+            } catch (e) {
+                // Fallback pentru browsere vechi
+                const ta = document.createElement('textarea');
+                ta.value = code;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                alert('Cod copiat');
+            }
+        });
+    </script>
+</body>
+</html>

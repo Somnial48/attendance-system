@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generarea QR pentru Inregistrare</title>
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+    <style>
+        body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, sans-serif; background: #121212; color: #fff; margin: 0; }
+        .container { max-width: 900px; margin: 0 auto; padding: 24px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .back-btn { background: rgba(255,255,255,0.1); color: #fff; text-decoration: none; padding: 10px 16px; border-radius: 8px; }
+        h1 { color: #4CAF50; }
+        .card { background: rgba(255,255,255,0.08); border-radius: 16px; padding: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.35); }
+        .qr { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+        .qr img { width: 280px; height: 280px; border-radius: 12px; background: #fff; padding: 8px; }
+        .url { background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px; font-family: monospace; word-break: break-all; }
+        .actions { margin-top: 16px; display: flex; gap: 12px; flex-wrap: wrap; }
+        .btn { background: linear-gradient(135deg, #4CAF50, #45a049); border: none; color: #fff; padding: 10px 16px; border-radius: 8px; cursor: pointer; }
+        .btn.secondary { background: rgba(255,255,255,0.1); }
+        .tip { opacity: 0.8; font-size: 0.95em; margin-top: 8px; }
+        .fullscreen-btn { position: fixed; top: 16px; right: 16px; background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 10px 16px; border-radius: 8px; cursor: pointer; z-index: 1000; }
+        .fullscreen-btn:hover { background: rgba(255,255,255,0.2); }
+        .fullscreen-mode { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+        .fullscreen-mode .container { max-width: none; }
+        .fullscreen-mode .qr { justify-content: center; }
+        .fullscreen-mode .qr img { width: 500px; height: 500px; }
+        .support-line {
+            margin-top: 20px;
+            text-align: center;
+            opacity: 0.6;
+            font-size: 0.85em;
+        }
+        .support-line a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .support-line a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <button class="fullscreen-btn" id="fullscreenBtn">⛶ Fullscreen</button>
+    <div class="container">
+        <div class="header">
+            <h1>QR cod pentru inregistrare</h1>
+            <a href="/admin/dashboard" class="back-btn">← Inapoi la Dashboard</a>
+        </div>
+
+        <div class="card">
+            <p class="tip">Domnu Bumbu, aratati asat la proiector HELLO!!</p>
+            <div class="qr">
+                <img src="data:image/png;base64,{{ qr_base64 }}" alt="Registration QR Code">
+                <div style="flex: 1; min-width: 280px;">
+                    <div class="label" style="opacity:0.9; margin-bottom:8px;">URL inregistrare</div>
+                    <div class="url">{{ registration_url }}</div>
+                    <div class="actions">
+                        <button class="btn" id="copyUrlBtn">Copy URL</button>
+                        <a class="btn secondary" href="{{ registration_url }}" target="_blank">Poti si sa il dechizi</a>
+                        <a class="btn secondary" download="registration_qr.png" id="downloadBtn">Vrei sa il descarci?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="support-line">Daca ai nevoie de suport baga un email la <a href="mailto:dev@prezenta.app">dev@prezenta.app</a></div>
+    </div>
+
+    <script>
+        // Full screen
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        let isFullscreen = false;
+
+        fullscreenBtn.addEventListener('click', () => {
+            if (!isFullscreen) {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.webkitRequestFullscreen) {
+                    document.documentElement.webkitRequestFullscreen();
+                } else if (document.documentElement.msRequestFullscreen) {
+                    document.documentElement.msRequestFullscreen();
+                }
+                document.body.classList.add('fullscreen-mode');
+                fullscreenBtn.textContent = '✕ Exit Fullscreen';
+                isFullscreen = true;
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+                document.body.classList.remove('fullscreen-mode');
+                fullscreenBtn.textContent = '⛶ Fullscreen';
+                isFullscreen = false;
+            }
+        });
+
+        // Handle fullscreen change events (e.g., ESC key)
+        document.addEventListener('fullscreenchange', () => {
+            if (!document.fullscreenElement) {
+                document.body.classList.remove('fullscreen-mode');
+                fullscreenBtn.textContent = '⛶ Fullscreen';
+                isFullscreen = false;
+            }
+        });
+
+        document.addEventListener('webkitfullscreenchange', () => {
+            if (!document.webkitFullscreenElement) {
+                document.body.classList.remove('fullscreen-mode');
+                fullscreenBtn.textContent = '⛶ Fullscreen';
+                isFullscreen = false;
+            }
+        });
+
+        document.getElementById('copyUrlBtn').addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText('{{ registration_url }}');
+                const btn = document.getElementById('copyUrlBtn');
+                btn.textContent = 'Copiat URL-ul';
+                setTimeout(() => btn.textContent = 'Copy URL', 1500);
+            } catch(e) {}
+        });
+        // QR Code download 
+        const downloadBtn = document.getElementById('downloadBtn');
+        downloadBtn.addEventListener('click', (e) => {
+            const a = e.currentTarget;
+            a.href = 'data:image/png;base64,{{ qr_base64 }}';
+        });
+    </script>
+</body>
+</html>

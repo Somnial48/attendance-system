@@ -1,0 +1,19 @@
+[2025-11-26 23:08:00 +0200] [983041] [INFO] Starting gunicorn 23.0.0
+[2025-11-26 23:08:00 +0200] [983041] [INFO] Listening at: http://127.0.0.1:5000 (983041)
+[2025-11-26 23:08:00 +0200] [983041] [INFO] Using worker: sync
+[2025-11-26 23:08:00 +0200] [983055] [INFO] Booting worker with pid: 983055
+[2025-11-26 23:08:00 +0200] [983056] [INFO] Booting worker with pid: 983056
+[2025-11-26 23:08:00 +0200] [983060] [INFO] Booting worker with pid: 983060
+[2025-11-27 02:42:05 +0200] [983041] [INFO] Handling signal: hup
+[2025-11-27 02:42:05 +0200] [983041] [INFO] Hang up: Master
+[2025-11-27 02:42:05 +0200] [983041] [ERROR] Worker (pid:983055) was sent SIGHUP!
+[2025-11-27 02:42:05 +0200] [983041] [ERROR] Worker (pid:983056) was sent SIGHUP!
+[2025-11-27 02:42:05 +0200] [983041] [ERROR] Worker (pid:983060) was sent SIGHUP!
+[2025-11-27 02:42:05 +0200] [1218358] [INFO] Booting worker with pid: 1218358
+[2025-11-27 02:42:05 +0200] [1218359] [INFO] Booting worker with pid: 1218359
+[2025-11-27 02:42:05 +0200] [1218360] [INFO] Booting worker with pid: 1218360
+[2025-11-27 17:31:44 +0200] [983041] [INFO] Handling signal: term
+[2025-11-27 17:31:44 +0200] [1218358] [INFO] Worker exiting (pid: 1218358)
+[2025-11-27 17:31:44 +0200] [1218360] [INFO] Worker exiting (pid: 1218360)
+[2025-11-27 17:31:44 +0200] [1218359] [INFO] Worker exiting (pid: 1218359)
+[2025-11-27 17:31:44 +0200] [983041] [INFO] Shutting down: Master

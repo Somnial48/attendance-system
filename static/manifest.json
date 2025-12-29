@@ -1,0 +1,10 @@
+{
+  "name": "Automatizarea Absentelor",
+  "short_name": "Absente-pentru-BUMBU",
+  "description": "Sistem de gestionare a absentelor pentru UTN, la domnul BUMBU",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a1a",
+  "theme_color": "#4CAF50",
+  "orientation": "portrait"
+}

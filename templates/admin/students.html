@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Students</title>
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        h1 {
+            color: #4CAF50;
+            font-size: 2em;
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 1em;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .add-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+        
+        .add-section h2 {
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            margin-bottom: 8px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        input {
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1em;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        .add-btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        
+        .add-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .add-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .table-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: rgba(76, 175, 80, 0.2);
+            padding: 15px;
+            text-align: left;
+            border-bottom: 2px solid #4CAF50;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .device-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .device-badge.registered {
+            background: rgba(76, 175, 80, 0.3);
+            color: #4CAF50;
+        }
+        
+        .device-badge.not-registered {
+            background: rgba(255, 152, 0, 0.3);
+            color: #FF9800;
+        }
+        
+        .device-badge.mobile {
+            background: rgba(76, 175, 80, 0.3);
+            color: #4CAF50;
+        }
+        
+        .device-badge.computer {
+            background: rgba(244, 67, 54, 0.3);
+            color: #f44336;
+        }
+        
+        .device-badge.unknown {
+            background: rgba(158, 158, 158, 0.3);
+            color: #9e9e9e;
+        }
+        
+        .action-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-right: 5px;
+        }
+        
+        .reset-btn {
+            background: rgba(255, 152, 0, 0.8);
+            color: white;
+        }
+        
+        .reset-btn:hover {
+            background: rgba(255, 152, 0, 1);
+        }
+        
+        .delete-btn {
+            background: rgba(244, 67, 54, 0.8);
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background: rgba(244, 67, 54, 1);
+        }
+        
+        .no-data {
+            text-align: center;
+            opacity: 0.6;
+            padding: 40px;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .message.success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4CAF50;
+        }
+        
+        .message.error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 2px solid #f44336;
+        }
+        .support-line {
+            margin-top: 20px;
+            text-align: center;
+            opacity: 0.6;
+            font-size: 0.85em;
+        }
+        .support-line a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .support-line a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Vezi ce studenti sunt inregistrati</h1>
+        <a href="/admin/dashboard" class="back-btn">← Inapoi la Dashboard</a>
+    </div>
+    
+    <div class="container">
+        <div id="message"></div>
+        
+        <div class="add-section">
+            <h2>Adauga un nou student</h2>
+            <form id="addStudentForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="surname">Prenume</label>
+                        <input type="text" id="surname" pattern="[A-Za-z\s]+" required placeholder="Prenume">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="name">Numele de familie</label>
+                        <input type="text" id="name" pattern="[A-Za-z\s]+" required placeholder="Nume">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="group">Grupa</label>
+                        <input type="text" id="group" required placeholder="e.g., SI-254">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="barcode">Barcode (optional)</label>
+                        <input type="text" id="barcode" placeholder="8-digit barcode" pattern="\d{8}" maxlength="8">
+                    </div>
+                </div>
+                
+                <button type="submit" class="add-btn" id="addBtn">Adauga Student</button>
+            </form>
+        </div>
+        
+        <div class="table-section">
+            <h2 style="margin-bottom: 20px; color: #4CAF50;">Lista Studentilor</h2>
+            
+            {% if students %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Prenume Nume</th>
+                        <th>Grupa</th>
+                        <th>Status Dispozitiv</th>
+                        <th>Tip Dispozitiv</th>
+                        <th>Inregistrat La</th>
+                        <th>Ceva sa ii faci</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td>{{ student.surname }} {{ student.name }}</td>
+                        <td>{{ student.group }}</td>
+                        <td>
+                            {% if student.has_device %}
+                            <span class="device-badge registered">✓ Inregistrat</span>
+                            {% else %}
+                            <span class="device-badge not-registered">⚠ Neinregistrat</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if student.has_device %}
+                                {% if student.device_type == 'mobile' %}
+                                <span class="device-badge mobile">📱 Mobile</span>
+                                {% elif student.device_type == 'computer' %}
+                                <span class="device-badge computer">💻 Computer</span>
+                                {% else %}
+                                <span class="device-badge unknown">❓ Idee nu am</span>
+                                {% endif %}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>{{ student.registered_at or 'N/A' }}</td>
+                        <td>
+                            {% if student.has_device %}
+                            <button class="action-btn reset-btn" onclick="resetDevice('{{ student.id }}')">Reseteaza dispzitiv</button>
+                            {% endif %}
+                            <button class="action-btn delete-btn" onclick="deleteStudent('{{ student.id }}', '{{ student.surname }} {{ student.name }}')">Sterge</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="no-data">Niciun student inregistrat inca</div>
+            {% endif %}
+        </div>
+        <div class="support-line">Daca ai nevoie de suport baga un email la <a href="mailto:dev@prezenta.app">dev@prezenta.app</a></div>
+    </div>
+    
+    <script>
+        const messageDiv = document.getElementById('message');
+        
+        document.getElementById('addStudentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const addBtn = document.getElementById('addBtn');
+            addBtn.disabled = true;
+            addBtn.textContent = 'Adding...';
+            
+            const formData = {
+                action: 'add',
+                name: document.getElementById('name').value.trim(),
+                surname: document.getElementById('surname').value.trim(),
+                group: document.getElementById('group').value.trim().toUpperCase(),
+                barcode: document.getElementById('barcode').value.trim() || ''  // Optional
+            };
+            
+            try {
+                const response = await fetch('/admin/students', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    messageDiv.innerHTML = '<div class="message success">✓ ' + result.message + '</div>';
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    messageDiv.innerHTML = '<div class="message error">✗ ' + result.error + '</div>';
+                }
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="message error">✗ Nu sa putut adauga studentul</div>';
+            }
+            
+            addBtn.disabled = false;
+            addBtn.textContent = 'Adauga Student';
+        });
+        
+        async function resetDevice(studentId) {
+            if (!confirm('Resetare token dispozitiv pentru acest student?')) return;
+            
+            try {
+                const response = await fetch('/admin/students', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: 'reset_device', student_id: studentId })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    messageDiv.innerHTML = '<div class="message success">✓ ' + result.message + '</div>';
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    messageDiv.innerHTML = '<div class="message error">✗ ' + result.error + '</div>';
+                }
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="message error">✗ Nu sa putut reseta dispozitivul</div>';
+            }
+        }
+        
+        async function deleteStudent(studentId, name) {
+            if (!confirm(`Sterge studentul ${name}? Aceasta actiune nu poate fi anulata.`)) return;
+            
+            try {
+                const response = await fetch('/admin/students', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ action: 'delete', student_id: studentId })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    messageDiv.innerHTML = '<div class="message success">✓ ' + result.message + '</div>';
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    messageDiv.innerHTML = '<div class="message error">✗ ' + result.error + '</div>';
+                }
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="message error">✗ Eroare la stergerea studentului</div>';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reinregistrare Dispozitiv</title>
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2em;
+            color: #4CAF50;
+        }
+        
+        .subtitle {
+            text-align: center;
+            margin-bottom: 30px;
+            opacity: 0.8;
+            font-size: 0.9em;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .submit-button {
+            width: 100%;
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+        }
+        
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(76, 175, 80, 0.4);
+        }
+        
+        .submit-button:active {
+            transform: translateY(0);
+        }
+        
+        .submit-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #4CAF50;
+            text-decoration: none;
+            opacity: 0.8;
+        }
+        
+        .back-link:hover {
+            opacity: 1;
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .message.success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4CAF50;
+        }
+        
+        .message.error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 2px solid #f44336;
+        }
+        
+        .helper-text {
+            font-size: 0.85em;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        
+        .info-box {
+            background: rgba(33, 150, 243, 0.2);
+            border: 2px solid #2196F3;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box h3 {
+            margin-bottom: 10px;
+            color: #2196F3;
+        }
+        .support-line {
+            margin-top: 20px;
+            text-align: center;
+            opacity: 0.6;
+            font-size: 0.85em;
+        }
+        .support-line a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .support-line a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Schimba divice-ul</h1>
+        <p class="subtitle">Inregistrati un nou telefon sau dispozitiv</p>
+        
+        <div class="info-box">
+            <h3>Cod de Confirmare</h3>
+            <p>Codul dumneavoastra de confirmare este: <strong>Grupa + Prima litera a numelui</strong></p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Exemplu: Daca grupa este SI-254 si numele este Popescu, codul este <strong>SI-254P</strong></p>
+        </div>
+        
+        <div id="message"></div>
+        
+        <form id="reregisterForm">
+            <div class="form-group">
+                <label for="surname">Prenumele</label>
+                <input type="text" id="surname" name="surname" pattern="[A-Za-z\s]+" required placeholder="Prenumele tau">
+            </div>
+            
+            <div class="form-group">
+                <label for="name">Numele de familie</label>
+                <input type="text" id="name" name="name" pattern="[A-Za-z\s]+" required placeholder="Numele tau">
+            </div>
+            
+            <div class="form-group">
+                <label for="group">Grupa</label>
+                <input type="text" id="group" name="group" required placeholder="e.g., SI-254">
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmation_code">Cod de Confirmare</label>
+                <input type="text" id="confirmation_code" name="confirmation_code" required placeholder="e.g., SI-254P">
+                <div class="helper-text">Grupa + Prima litera a numelui</div>
+            </div>
+            
+            <button type="submit" class="submit-button" id="submitBtn">Inregistrare Dispozitiv Nou</button>
+        </form>
+        
+        <a href="/" class="back-link">← Inapoi la Acasa</a>
+        <div class="support-line">Daca ai nevoie de suport baga un email la <a href="mailto:dev@prezenta.app">dev@prezenta.app</a></div>
+    </div>
+    
+    <script>
+        // Se ia tokenul existent
+        function getExistingDeviceToken() {
+            return localStorage.getItem('device_token') || '';
+        }
+        
+        // Se genereaza un token nou
+        function generateNewDeviceToken() {
+            const array = new Uint8Array(32);
+            crypto.getRandomValues(array);
+            const token = btoa(String.fromCharCode.apply(null, array));
+            localStorage.setItem('device_token', token);
+            return token;
+        }
+        
+        document.getElementById('reregisterForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const messageDiv = document.getElementById('message');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Processing...';
+            
+            // Se trimite tokenul existent pentru verificarea cooldown-ului si se cere un token nou
+            const existingToken = getExistingDeviceToken();
+            
+            const formData = {
+                name: document.getElementById('name').value.trim(),
+                surname: document.getElementById('surname').value.trim(),
+                group: document.getElementById('group').value.trim().toUpperCase(),
+                confirmation_code: document.getElementById('confirmation_code').value.trim(),
+                existing_device_token: existingToken  // Pentru verificarea cooldown-ului
+            };
+            
+            try {
+                const response = await fetch('/reregister-device', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Se salveaza tokenul nou de la server
+                    if (result.new_device_token) {
+                        localStorage.setItem('device_token', result.new_device_token);
+                    }
+                    
+                    // Se stocheaza datele in localStorage
+                    localStorage.setItem('student_name', formData.name);
+                    localStorage.setItem('student_surname', formData.surname);
+                    localStorage.setItem('student_group', formData.group);
+                    messageDiv.innerHTML = '<div class="message success">✓ ' + result.message + '</div>';
+                    document.getElementById('reregisterForm').reset();
+                    
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    messageDiv.innerHTML = '<div class="message error">✗ ' + result.error + '</div>';
+                }
+            } catch (error) {
+                messageDiv.innerHTML = '<div class="message error">Mai inceraca odata.</div>';
+            }
+            
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Inregistrreaza Dispozitiv Nou!!';
+        });
+    </script>
+</body>
+</html>

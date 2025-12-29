@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prezenta tuturor</title>
+    <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            max-width: 1200px;
+            margin: 0 auto 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        h1 {
+            color: #4CAF50;
+            font-size: 2em;
+        }
+        
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 1em;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .filters {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+        
+        .filters h2 {
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+        
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        label {
+            margin-bottom: 8px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        input, select {
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1em;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        
+        select option {
+            background: #2d2d2d;
+            color: #fff;
+        }
+        
+        .apply-btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 15px;
+        }
+        
+        .apply-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .export-btn {
+            background: rgba(33, 150, 243, 0.8);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .export-btn:hover {
+            background: rgba(33, 150, 243, 1);
+            transform: translateY(-2px);
+        }
+        
+        .export-btn.excel {
+            background: rgba(76, 175, 80, 0.8);
+        }
+        
+        .export-btn.excel:hover {
+            background: rgba(76, 175, 80, 1);
+        }
+        
+        .table-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: rgba(76, 175, 80, 0.2);
+            padding: 15px;
+            text-align: left;
+            border-bottom: 2px solid #4CAF50;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .no-data {
+            text-align: center;
+            opacity: 0.6;
+            padding: 40px;
+        }
+        
+        .status-present {
+            color: #4CAF50;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .status-present:hover {
+            background: rgba(76, 175, 80, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .status-absent {
+            color: #f44336;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .status-absent:hover {
+            background: rgba(244, 67, 54, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .status-icon {
+            font-size: 1.2em;
+        }
+        
+        .stats-bar {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px 25px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        
+        .stat-value.present {
+            color: #4CAF50;
+        }
+        
+        .stat-value.absent {
+            color: #f44336;
+        }
+        
+        .stat-value.total {
+            color: #2196F3;
+        }
+        
+        .stat-label {
+            opacity: 0.8;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .info-message {
+            background: rgba(33, 150, 243, 0.2);
+            border: 1px solid rgba(33, 150, 243, 0.5);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .support-line {
+            margin-top: 20px;
+            text-align: center;
+            opacity: 0.6;
+            font-size: 0.85em;
+        }
+        .support-line a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .support-line a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Prezenta tuturor</h1>
+        <a href="/admin/dashboard" class="back-btn">← Inapoi la Dashboard</a>
+    </div>
+    
+    <div class="container">
+        <div class="filters">
+            <h2>Filtre</h2>
+            <form method="GET" action="/admin/attendance">
+                <div class="filter-grid">
+                    <div class="filter-group">
+                        <label for="date">Data</label>
+                        <input type="date" id="date" name="date" value="{{ request.args.get('date', '') }}">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="lesson">Lectia</label>
+                        <select id="lesson" name="lesson">
+                            <option value="">Toate lectiile</option>
+                            {% for lesson in lessons %}
+                            <option value="{{ lesson }}" {% if request.args.get('lesson') == lesson %}selected{% endif %}>{{ lesson }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="group">Grupa</label>
+                        <select id="group" name="group">
+                            <option value="">Toate grupele</option>
+                            {% for group in groups %}
+                            <option value="{{ group }}" {% if request.args.get('group') == group %}selected{% endif %}>{{ group }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="submit" class="apply-btn">Aplica Filtre</button>
+                
+                <div class="export-buttons">
+                    <a href="/admin/attendance/export/excel?date={{ request.args.get('date', '') }}&lesson={{ request.args.get('lesson', '') }}&group={{ request.args.get('group', '') }}" class="export-btn excel">
+                        📊 Export Excel
+                    </a>
+                </div>
+            </form>
+        </div>
+        
+        <div class="table-section">
+            <h2 style="margin-bottom: 20px; color: #4CAF50;">Lista prezentelor</h2>
+            
+            {% if not show_status %}
+            <div class="info-message">
+             Selecteaza o <strong>Grupa</strong> si o <strong>Lectie</strong> pentru a vedea statusul complet al prezentei (prezent/absent).
+            </div>
+            {% endif %}
+            
+            {% if stats %}
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value total">{{ stats.total }}</div>
+                    <div class="stat-label">Total Studenti</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value present">{{ stats.prezenti }}</div>
+                    <div class="stat-label">Prezenti</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value absent">{{ stats.absenti }}</div>
+                    <div class="stat-label">Absenti</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value present">{{ stats.procentaj }}%</div>
+                    <div class="stat-label">Procentajul Prezentei, sa fim in obraz</div>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if attendance %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Prenume Nume</th>
+                        <th>Grupa</th>
+                        <th>Lectia</th>
+                        {% if show_status %}
+                        <th>Status</th>
+                        {% endif %}
+                        <th>Timestamp</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in attendance %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ record.name }}</td>
+                        <td>{{ record.group }}</td>
+                        <td>{{ record.lesson_id }}</td>
+                        {% if show_status %}
+                        <td>
+                            {% if record.is_present %}
+                            <span class="status-present" onclick="toggleAttendance('{{ record.student_id }}', '{{ record.name }}', '{{ record.group }}', '{{ record.lesson_id }}', this)">
+                                <span class="status-icon">✓</span> Prezent
+                            </span>
+                            {% else %}
+                            <span class="status-absent" onclick="toggleAttendance('{{ record.student_id }}', '{{ record.name }}', '{{ record.group }}', '{{ record.lesson_id }}', this)">
+                                <span class="status-icon">✗</span> Absent
+                            </span>
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                        <td>{{ record.timestamp }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="no-data">Nu au fost gasite inregistrari de prezenta</div>
+            {% endif %}
+        </div>
+        <div class="support-line">Daca ai nevoie de suport baga un email la <a href="mailto:dev@prezenta.app">dev@prezenta.app</a></div>
+    </div>
+    
+    <script>
+        function toggleAttendance(studentId, studentName, group, lessonId, element) {
+            // Dezactiveaza clokck-ul pentru a preveni multiple click-uri
+            element.style.pointerEvents = 'none';
+            element.style.opacity = '0.6';
+            
+            fetch('/api/admin/toggle-attendance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    student_id: studentId,
+                    student_name: studentName,
+                    group: group,
+                    lesson_id: lessonId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Status actualizat
+                    if (data.is_present) {
+                        element.className = 'status-present';
+                        element.innerHTML = '<span class="status-icon">✓</span> Prezent';
+                    } else {
+                        element.className = 'status-absent';
+                        element.innerHTML = '<span class="status-icon">✗</span> Absent';
+                    }
+                    
+                    // se face update la statiscii
+                    location.reload();
+                } else {
+                    alert('Eroare: ' + (data.error || 'Unknown error'));
+                    element.style.pointerEvents = 'auto';
+                    element.style.opacity = '1';
+                }
+            })
+            .catch(error => {
+                alert('Eroare de conexiune: ' + error);
+                element.style.pointerEvents = 'auto';
+                element.style.opacity = '1';
+            });
+        }
+    </script>
+</body>
+</html>
