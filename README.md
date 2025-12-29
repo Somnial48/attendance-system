@@ -74,7 +74,8 @@ A modern, QR code-based attendance tracking system designed for educational inst
    
    The database will be automatically created on first run. The system will create:
    - `data/` directory for database storage
-   - Default admin account (username: `admin`, password: `admin`)
+   - Default admin account with username `admin` and password `admin`
+   - **Security Note**: These default credentials must be changed immediately after first login
 
 6. **Run the application**
 
@@ -141,8 +142,8 @@ ALLOWED_PUBLIC_IPS = [
 
 1. **Login**
    - Navigate to `/admin/login`
-   - Use the default admin credentials (check system documentation or source code)
-   - **Important**: Change the default password immediately after first login for security
+   - Use the default credentials: username `admin`, password `admin` (created during initial setup)
+   - **Critical**: Change the default password immediately after first login for security
 
 2. **Generate QR Codes**
    - Go to "Generate QR Code" in the admin panel
